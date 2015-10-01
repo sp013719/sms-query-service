@@ -11,6 +11,7 @@
         <table>
         {% for status in statuses %}
             <tr>
+                <td>{{ loop.index }}</td>
                 <td>{{ status }}</td>
                 <td>{{ statuses[status] }}</td>
             </tr>
