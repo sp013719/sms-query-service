@@ -14,7 +14,7 @@ def get_image(batch_id):
     filename = 'results/%s.png' % batch_id 
     url = 'http://localhost:5000/get_status/%s' % batch_id
     #url = 'http://www.google.com.tw'
-    subprocess.call(['java', '-jar', '/vagrant/webvector-3.4.jar', url, filename, 'png'])
+    subprocess.call(['java', '-jar', 'libs/webvector-3.4.jar', url, filename, 'png'])
     #cmd = ['java', '-jar', '/vagrant/webvector-3.4.jar', url, filename, 'png']    
     #p = subprocess.Popen(cmd, stdout = subprocess.PIPE,
     #                        stderr=subprocess.PIPE,
