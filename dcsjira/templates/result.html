@@ -8,6 +8,7 @@
         </style>
     </head>
     <body>
+    {% if statuses %}
         <table>
         {% for status in statuses %}
             <tr>
@@ -21,5 +22,8 @@
         <div>
             last update: {{ time_stamp }}
         </div>
+    {% else %}
+        <div>No data for batch id: {{ batch_id }}.</div>
+    {% endif %}
     </body>
 </html>
