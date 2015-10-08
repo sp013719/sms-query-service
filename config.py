@@ -17,7 +17,7 @@ class DevelopmentConfig(Config):
 
 
 class DevelopmentContainerConfig(DevelopmentConfig):
-    DEBUG = True
+    HOST = '0.0.0.0'
 
 
 class TestingConfig(Config):
