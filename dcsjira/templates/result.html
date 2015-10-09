@@ -35,7 +35,8 @@
         {% endfor %}            
         </table>
         <div class="footer">
-            last update: {{ time_stamp }}
+            <p>last update: {{ time_stamp }}</p>
+            <p>Please refresh (Ctrl + r) the page to update the status</p>
         </div>
     {% else %}
         <div>No data for batch id: {{ batch_id }}.</div>
