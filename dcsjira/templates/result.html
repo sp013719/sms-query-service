@@ -2,24 +2,39 @@
 <html>
     <head>
         <style>
+            body {
+                font-family: Arial, Helvetica, sans-serif;
+            }
             table, th, td {
                 border: 1px solid black;
+            }
+            td {
+                padding: 3px;
+            }
+            div.header {
+                padding-bottom: 20px;
+            }
+            div.footer {
+                padding-top: 30px;
             }
         </style>
     </head>
     <body>
+        <div class="header">
+            SMS delivery status for batch id: {{ batch_id }}.
+        </div>
     {% if statuses %}
-        <table>
+        <table cellspacing="0">
         {% for status in statuses %}
             <tr>
                 <td>{{ loop.index }}</td>
-                <td>{{ status }}</td>
-                <td>{{ statuses[status] }}</td>
+                <td>{{ status['name'] }}</td>
+                <td>{{ status['number'] }}</td>
+                <td>{{ status['status'] }}</td>
             </tr>
         {% endfor %}            
         </table>
-        <br/><br/>
-        <div>
+        <div class="footer">
             last update: {{ time_stamp }}
         </div>
     {% else %}

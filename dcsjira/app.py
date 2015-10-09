@@ -2,9 +2,9 @@ import urllib
 import subprocess
 import os
 from datetime import datetime
-from flask import Flask
-from flask import send_file
-from flask import render_template
+from dcsjira.service.dcsportal import Dcsportal
+from flask import Flask, send_file, render_template, current_app
+
 
 app = Flask(__name__)
 
@@ -36,11 +36,11 @@ def create_app(config='config.DevelopmentConfig'):
     return app
 
 
-@app.route('/get_image/<batch_id>')
-def get_image(batch_id):
+@app.route('/get_image/<batch_id>/<group_id>')
+def get_image(batch_id, group_id):
     file_name = 'results/%s.png' % batch_id
     file_path = os.path.join(project_root_dir, file_name)
-    url = 'http://localhost:5000/get_status/%s' % batch_id
+    url = 'http://localhost:5000/get_status/%s/%s' % (batch_id, group_id)
 
     try:
         cmd = ['java', '-jar', os.path.join(project_root_dir, 'libs/webvector-3.4.jar'), url, file_name, 'png']
@@ -52,13 +52,15 @@ def get_image(batch_id):
         return render_template('error.html')
 
 
-@app.route('/get_status/<batch_id>')
-def get_status(batch_id):
+@app.route('/get_status/<batch_id>/<group_id>')
+def get_status(batch_id, group_id):
     time_stamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     api_url = app.config['API_URL']
 
     params = urllib.urlencode({'username': account, 'password': password, 'batch_id': batch_id})
     res = urllib.urlopen(api_url, params)
+
+    current_app.logger.debug('http response code: %d' % res.code)
 
     if res.code != 200:
         return render_template('error.html')
@@ -66,15 +68,23 @@ def get_status(batch_id):
     content = res.readlines()
     api_result = content[0].split('|')
 
+    current_app.logger.debug('api result: %s' % content[0])
+
     if int(api_result[0]) != 0:
         return render_template('error.html', error_msg=api_result[1])
 
-    statuses = dict()
+    client = Dcsportal('http://dcs-portal.trendmicro.com/TMPrivilege/dcsinterface')
+    group_detail = client.get_group_detail(group_id)
+    statuses = []
 
     for line in content[2:]:
         tmp = line.split('|')
         number = '+%s' % tmp[0]
-        sms_status = tmp[1].strip()
-        statuses[number] = message_code[sms_status]
+        display_name = group_detail.get(number, 'Unknown')
+        sms_status = message_code.get(tmp[1].strip(), 'Unknown')
+
+        statuses.append({'name': display_name, 'number': number, 'status': sms_status})
+
+    print statuses
 
     return render_template('result.html', statuses=statuses, time_stamp=time_stamp, batch_id=batch_id)
