@@ -3,9 +3,11 @@ class Config(object):
     TESTING = False
 
     # bulksms api
-    API_URL = 'http://usa.bulksms.com/eapi/status_reports/get_report/2/2.0'
+    SMS_API_URL = 'http://usa.bulksms.com/eapi/status_reports/get_report/2/2.0'
     HOST = '0.0.0.0'
 
+    RESULT_FOLDER = 'results'
+    PORTAL_API_URL = 'http://dcs-portal.trendmicro.com/TMPrivilege/dcsinterface'
 
 class ProductionConfig(Config):
     pass

@@ -25,6 +25,6 @@ class Dcsportal(object):
         phones = {}
 
         for member in members:
-            phones[member['phone']] = member['displayName']
+            phones[member['phone'].replace(' ', '').replace('-', '')] = member['displayName']
 
         return phones

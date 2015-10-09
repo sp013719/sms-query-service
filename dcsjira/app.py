@@ -38,9 +38,9 @@ def create_app(config='config.DevelopmentConfig'):
 
 @app.route('/get_image/<batch_id>/<group_id>')
 def get_image(batch_id, group_id):
-    file_name = 'results/%s.png' % batch_id
+    url = 'http://%s:%s/get_status/%s/%s' % (app.config['HOST'], app.config['PORT'], batch_id, group_id)
+    file_name = '%s/%s.png' % (app.config['RESULT_FOLDER'], batch_id)
     file_path = os.path.join(project_root_dir, file_name)
-    url = 'http://localhost:5000/get_status/%s/%s' % (batch_id, group_id)
 
     try:
         cmd = ['java', '-jar', os.path.join(project_root_dir, 'libs/webvector-3.4.jar'), url, file_name, 'png']
@@ -48,17 +48,18 @@ def get_image(batch_id, group_id):
         if subprocess.call(cmd) == 0:
             return send_file(file_path, mimetype='image/png')
         raise ValueError('execute command failed')
-    except ValueError:
+    except ValueError as ex:
+        current_app.logger.error(ex.message)
+
         return render_template('error.html')
 
 
 @app.route('/get_status/<batch_id>/<group_id>')
 def get_status(batch_id, group_id):
     time_stamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    api_url = app.config['API_URL']
 
     params = urllib.urlencode({'username': account, 'password': password, 'batch_id': batch_id})
-    res = urllib.urlopen(api_url, params)
+    res = urllib.urlopen(app.config['SMS_API_URL'], params)
 
     current_app.logger.debug('http response code: %d' % res.code)
 
@@ -73,7 +74,7 @@ def get_status(batch_id, group_id):
     if int(api_result[0]) != 0:
         return render_template('error.html', error_msg=api_result[1])
 
-    client = Dcsportal('http://dcs-portal.trendmicro.com/TMPrivilege/dcsinterface')
+    client = Dcsportal(app.config['PORTAL_API_URL'])
     group_detail = client.get_group_detail(group_id)
     statuses = []
 
@@ -84,7 +85,5 @@ def get_status(batch_id, group_id):
         sms_status = message_code.get(tmp[1].strip(), 'Unknown')
 
         statuses.append({'name': display_name, 'number': number, 'status': sms_status})
-
-    print statuses
 
     return render_template('result.html', statuses=statuses, time_stamp=time_stamp, batch_id=batch_id)
