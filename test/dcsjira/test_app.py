@@ -33,4 +33,4 @@ class AppTest(unittest.TestCase):
         url = '/get_image/%s/%s' % ('768791424', '2')
         res = self.app.get(url)
         self.assertEqual(200, res.status_code)
-        self.assertEqual(res.headers['Content-Type'], '')
+        self.assertEqual(res.headers['Content-Type'], 'image/png')
