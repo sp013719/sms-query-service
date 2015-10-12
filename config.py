@@ -9,6 +9,7 @@ class Config(object):
     RESULT_FOLDER = 'results'
     PORTAL_API_URL = 'http://dcs-portal.trendmicro.com/TMPrivilege/dcsinterface'
 
+
 class ProductionConfig(Config):
     pass
 
